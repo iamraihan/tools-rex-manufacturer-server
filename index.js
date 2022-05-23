@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config()
 const app = express()
@@ -17,23 +17,39 @@ const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.USER_PASS}@clu
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
-// client.connect(err => {
-//     const collection = client.db("test").collection("devices");
-//     // perform actions on the collection object
-//     client.close();
-// });
-
 async function run() {
     try {
         await client.connect();
         const productCollection = client.db("product-collection").collection("products");
+
         app.get('/products', async (req, res) => {
             const query = {}
             const cursor = productCollection.find(query);
-            const result = await cursor.toArray()
+            const number = 6
+            const result = await cursor.limit(number).toArray()
+            res.send(result)
+        })
+        app.get('/products/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: ObjectId(id) }
+            const result = await productCollection.findOne(filter)
+            res.send(result)
+        })
+        app.put('/products/:id', async (req, res) => {
+            const id = req.params.id
+            const update = req.body
+            console.log(update);
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: update
+            };
+            const result = await productCollection.updateOne(filter, updateDoc, options);
             console.log(result);
             res.send(result)
         })
+
+
 
     } finally { }
 }
