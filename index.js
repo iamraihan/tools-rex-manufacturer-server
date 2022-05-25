@@ -39,6 +39,7 @@ async function run() {
         const productCollection = client.db("product-collection").collection("products");
         const orderCollection = client.db("order-collection").collection("orders");
         const userCollection = client.db("order-collection").collection("users");
+        const profileCollection = client.db("order-collection").collection("profiles");
 
         app.get('/products', async (req, res) => {
             const query = {}
@@ -155,7 +156,17 @@ async function run() {
             res.send({ admin: isAdmin })
         })
 
-
+        app.put('/profile/:email', async (req, res) => {
+            const email = req.params.email
+            const profile = req.body
+            const filter = { email: email }
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: profile,
+            };
+            const result = await profileCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
 
 
 
