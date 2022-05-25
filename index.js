@@ -44,7 +44,8 @@ async function run() {
             const query = {}
             const cursor = productCollection.find(query);
             const number = 6
-            const result = await cursor.limit(number).toArray()
+            // const result = await cursor.limit(number).toArray()
+            const result = await cursor.toArray()
             res.send(result)
         })
         app.delete('/product/:id', async (req, res) => {
