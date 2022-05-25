@@ -25,7 +25,7 @@ function verifyJWT(req, res, next) {
     const token = authHeader.split(' ')[1]
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
         if (err) {
-            return res.status(403).send({ message: 'Forbidden' })
+            return res.status(403).send({ message: 'Forbidden Access' })
         }
         req.decoded = decoded
         next()
@@ -78,7 +78,12 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc, options);
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET);
             res.send({ result, token })
-
+        })
+        app.get('/users', async (req, res) => {
+            const query = {}
+            const cursor = userCollection.find(query)
+            const result = await cursor.toArray()
+            res.send(result)
         })
 
         app.post('/order', async (req, res) => {
@@ -91,9 +96,15 @@ async function run() {
         app.get('/order/:email', verifyJWT, async (req, res) => {
             const email = req.params.email
             const decodedEmail = req.decoded.email
-            const filter = { email: email }
-            const result = await orderCollection.find(filter).toArray()
-            res.send(result)
+            if (email === decodedEmail) {
+                const filter = { email: email }
+                const result = await orderCollection.find(filter).toArray()
+                res.send(result)
+            }
+            else {
+                return res.status(403).send({ message: 'Forbidden Access' })
+            }
+
 
         })
 
