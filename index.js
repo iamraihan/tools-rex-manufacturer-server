@@ -132,7 +132,7 @@ async function run() {
             const filter = { email: email }
             const user = await userCollection.findOne(filter)
             const isAdmin = user.role === 'admin'
-            res.send({ role: isAdmin })
+            res.send({ admin: isAdmin })
         })
 
 
