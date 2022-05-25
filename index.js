@@ -168,6 +168,12 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/profile', async (req, res) => {
+            const query = {}
+            const result = await profileCollection.find(query).toArray()
+            res.send(result)
+        })
+
 
 
     } finally { }
