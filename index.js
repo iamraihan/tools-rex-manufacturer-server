@@ -40,6 +40,7 @@ async function run() {
         const orderCollection = client.db("order-collection").collection("orders");
         const userCollection = client.db("order-collection").collection("users");
         const profileCollection = client.db("order-collection").collection("profiles");
+        const reviewCollection = client.db("order-collection").collection("reviews");
 
         app.get('/products', async (req, res) => {
             const query = {}
@@ -168,12 +169,19 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/profile', async (req, res) => {
-            const query = {}
-            const result = await profileCollection.find(query).toArray()
+        app.get('/profile/:email', async (req, res) => {
+            const email = req.params.email
+            const filter = { email: email }
+            const result = await profileCollection.findOne(filter)
             res.send(result)
         })
 
+        app.post('/review', async (req, res) => {
+            const review = req.body
+            const query = review
+            const result = await reviewCollection.insertOne(query)
+            res.send({ success: true, result })
+        })
 
 
     } finally { }
