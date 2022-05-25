@@ -59,6 +59,14 @@ async function run() {
             const result = await productCollection.deleteOne(query);
             res.send(result)
         })
+
+        app.post('/productAdd', async (req, res) => {
+            const product = req.body
+            const query = product
+            const result = await productCollection.insertOne(query)
+            return res.send({ success: true, result })
+        })
+
         app.get('/products/:id', async (req, res) => {
             const id = req.params.id
             const filter = { _id: ObjectId(id) }
@@ -146,6 +154,8 @@ async function run() {
             const isAdmin = user.role === 'admin'
             res.send({ admin: isAdmin })
         })
+
+
 
 
 
