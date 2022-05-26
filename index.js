@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5000
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
 //middleware
@@ -41,6 +42,19 @@ async function run() {
         const userCollection = client.db("order-collection").collection("users");
         const profileCollection = client.db("order-collection").collection("profiles");
         const reviewCollection = client.db("order-collection").collection("reviews");
+
+
+        app.post('/create-payment-intent', verifyJWT, async (req, res) => {
+            const service = req.body;
+            const price = service.price;
+            const amount = price * 100;
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card']
+            });
+            res.send({ clientSecret: paymentIntent.client_secret })
+        });
 
         app.get('/products', async (req, res) => {
             const query = {}
