@@ -70,14 +70,14 @@ async function run() {
             const result = await cursor.toArray()
             res.send(result)
         })
-        app.delete('/product/:id', async (req, res) => {
+        app.delete('/product/:id', verifyJWT, async (req, res) => {
             const id = req.params.id
             const query = { _id: ObjectId(id) }
             const result = await productCollection.deleteOne(query);
             res.send(result)
         })
 
-        app.post('/productAdd', async (req, res) => {
+        app.post('/productAdd', verifyJWT, async (req, res) => {
             const product = req.body
             const query = product
             const result = await productCollection.insertOne(query)
@@ -90,7 +90,7 @@ async function run() {
             const result = await productCollection.findOne(filter)
             res.send(result)
         })
-        app.put('/products/:id', async (req, res) => {
+        app.put('/products/:id', verifyJWT, async (req, res) => {
             const id = req.params.id
             const product = req.body
             console.log(update);
