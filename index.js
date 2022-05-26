@@ -108,6 +108,11 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/orders', async (req, res) => {
+            const query = {}
+            const result = await orderCollection.find(query).toArray()
+            res.send(result)
+        })
         app.post('/order', async (req, res) => {
             const order = req.body
             const query = order
@@ -185,6 +190,13 @@ async function run() {
         app.get('/reviews', async (req, res) => {
             const query = {}
             const result = await reviewCollection.find(query).toArray()
+            res.send(result)
+        })
+
+        app.get('/order/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: ObjectId(id) }
+            const result = await orderCollection.findOne(filter)
             res.send(result)
         })
 
