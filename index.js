@@ -42,6 +42,7 @@ async function run() {
         const userCollection = client.db("order-collection").collection("users");
         const profileCollection = client.db("order-collection").collection("profiles");
         const reviewCollection = client.db("order-collection").collection("reviews");
+        const paymentCollection = client.db("order-collection").collection("payments");
 
 
         app.post('/create-payment-intent', verifyJWT, async (req, res) => {
@@ -220,6 +221,21 @@ async function run() {
             const query = { _id: ObjectId(id) }
             const order = await orderCollection.findOne(query)
             res.send(order)
+        })
+        app.patch('/orders/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment.transactionId
+                }
+            }
+
+            const result = await paymentCollection.insertOne(payment);
+            const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
+            res.send(updatedOrder);
         })
 
 
